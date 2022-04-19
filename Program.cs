@@ -43,15 +43,12 @@ namespace PIVisionLabelFixerUtility
            else
             {
                 util.PressEnterToExit();
-            }
-            
+            }           
         }
 
         static public DataTable pullDataFromSQL(DataTable dataTable, string sqlserver, string visionDatabase)
         {
-
             string connString = $@"Server={sqlserver};Database={visionDatabase};Integrated Security=true;MultipleActiveResultSets=true"; /*---> using integrated security*/
-
             string query = @"SELECT [DisplayID],[Name], EditorDisplay FROM[dbo].[View_Displays]WHERE EditorDisplay Like '%""NameType"":""[ADFP]"",""CustomName"":""[^""]%'";
 
             SqlConnection conn = new SqlConnection(connString);
@@ -91,9 +88,6 @@ namespace PIVisionLabelFixerUtility
                                 util.WriteInWrite(obj["Name"].ToString());
                                 file.WriteLine(obj["Name"].ToString());
 
-                                string NameType = config["NameType"].ToString();
-                                string customName = config["CustomName"].ToString();
-
                                 util.WriteInYellow("NameType: " + config["NameType"].ToString() + ", removing-> CustomName: \"" + config["CustomName"].ToString() + "\"");
                                 file.WriteLine("NameType: " + config["NameType"].ToString() + ", removing-> CustomName: \"" + config["CustomName"].ToString() + "\"");
                                 config["CustomName"].Parent.Remove();
@@ -104,26 +98,17 @@ namespace PIVisionLabelFixerUtility
                     {
                         var config = item["Configuration"];
 
-/*                        string Name = item["Name"].ToString();
-                        util.WriteInWrite(Name);*/
-
                         if ((string)config["NameType"] != "C" && config["CustomName"] != null && item["SymbolType"].ToString() == "value")
                         {
                             util.WriteInWrite(item["Name"].ToString());
                             file.WriteLine(item["Name"].ToString());
 
-/*                            string NameType = config["NameType"].ToString();
-                            string customName = config["CustomName"].ToString();*/
-
                             util.WriteInYellow("NameType: " + config["NameType"].ToString() + ", removing-> CustomName: \"" + config["CustomName"].ToString() + "\"");
                             file.WriteLine("NameType: " + config["NameType"].ToString() + ", removing-> CustomName: \"" + config["CustomName"].ToString() + "\"");
                             config["CustomName"].Parent.Remove();
                         }
-                    }
-                   
+                    }                 
                 }
-
-                    /*util.WriteInGreen(json.ToString());*/
                     dr["EditorDisplay"] = JsonConvert.SerializeObject(json);
             }
         }
