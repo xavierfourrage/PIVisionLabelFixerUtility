@@ -10,30 +10,35 @@ namespace PIVisionLabelFixerUtility
 {
     class SQLdata
     {
-        public void TestingSQLConnection(string sqlserver)
+        public void TestingSQLConnection(string sqlserver, string piVisionSQLdBName)
         {
-            string connString = $@"Server={sqlserver};Database=PIVision;Integrated Security=true;MultipleActiveResultSets=true"; /*---> using integrated security*/
+            string connString = $@"Server={sqlserver};Database={piVisionSQLdBName};Integrated Security=true;MultipleActiveResultSets=true"; /*---> using integrated security*/
 
             SqlConnection connection = new SqlConnection(connString);
             connection.Open();
         }
 
-        public string ValidatingSQLConnection()
+        public (string,string) ValidatingPIVisionSQLdBName()
         {
-            Utilities util = new Utilities();
-            util.WriteInGreen("Enter the SQL Database instance hosting the PIVision database:");
+            Utilities util = new Utilities();       
             bool repeat = true;
             string sqlInstance = "";
-
+            string piVisionSQLdBName = "";
 
             while (repeat)
             {
+                util.WriteInGreen("Enter the SQL Server instance name:");
                 Console.ForegroundColor = ConsoleColor.White;
                 sqlInstance = Console.ReadLine();
 
+                util.WriteInGreen("Enter the PI Vision SQL database name:");              
+                Console.ForegroundColor = ConsoleColor.White;
+                piVisionSQLdBName = Console.ReadLine();
+
                 try
                 {
-                    TestingSQLConnection(sqlInstance);
+                    util.WriteInYellow("Validating connection to the PIVision SQL database...");
+                    TestingSQLConnection(sqlInstance,piVisionSQLdBName);
                     repeat = false;
                 }
                 catch (SqlException ex)
@@ -49,11 +54,11 @@ namespace PIVisionLabelFixerUtility
                             "Procedure: " + ex.Errors[i].Procedure + "\n");
                     }
                     util.WriteInRed(errorMessages.ToString());
-                    util.WriteInGreen("Something went wrong. Enter the SQL Database instance hosting the PIVision database:");
+                    util.WriteInGreen("Something went wrong.");
                     repeat = true;
                 }
             }
-            return sqlInstance;
+            return (sqlInstance,piVisionSQLdBName);
         }
     }
 

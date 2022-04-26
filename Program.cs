@@ -21,12 +21,17 @@ namespace PIVisionLabelFixerUtility
             SQLdata visiondata = new SQLdata();
             Utilities util = new Utilities();
 
-            string sqlInstance = visiondata.ValidatingSQLConnection();
+            /*string sqlInstance = visiondata.ValidatingSQLConnection();*/
+
+            DataTable dt = new DataTable();
+            var SQLParameters = visiondata.ValidatingPIVisionSQLdBName(); // getting SQL server & PIVision database name
+            string sqlInstance = SQLParameters.Item1;
+            string PIVisiondB = SQLParameters.Item2;
+
             util.WriteInGreen("Connection to the PIVision SQL database successful");
             util.WriteInGreen("Retrieving records...");
 
-            DataTable dt = new DataTable();           
-            dt = pullDataFromSQL(dt, sqlInstance, "PIVision");
+            dt = pullDataFromSQL(dt, sqlInstance,PIVisiondB);
             
             util.WriteInYellow("This utility will scan all Value symbols that contain TypeLabels = Description, Partial, Full, or A, and then remove the CustomName field if present");
             util.WriteInRed("Make sure you have taken a backup of your PIVision SQL database");
@@ -36,7 +41,7 @@ namespace PIVisionLabelFixerUtility
             {
                 editDataTable(dt);
                 util.WriteInBlue("Updating the SQL database... do not close the window.");
-                publishToSQL(dt, sqlInstance);
+                publishToSQL(dt, sqlInstance,PIVisiondB);
                 util.WriteInGreen("Output has been saved under: PIVisionLabelFixerUtility_output.txt");
                 util.PressEnterToExit();
             }
@@ -113,14 +118,14 @@ namespace PIVisionLabelFixerUtility
             }
         }
 
-        static public void publishToSQL(DataTable dt, string sqlserver)
+        static public void publishToSQL(DataTable dt, string sqlserver, string piVisiondB)
         {
             Utilities util = new Utilities();
             try
             {
                 foreach (DataRow row in dt.Rows)
                 {
-                    UpdateSQL(sqlserver, row["EditorDisplay"].ToString(), row["DisplayID"].ToString(),"PIVision");
+                    UpdateSQL(sqlserver, row["EditorDisplay"].ToString(), row["DisplayID"].ToString(), piVisiondB);
                 }
             }
             catch (SqlException ex)
